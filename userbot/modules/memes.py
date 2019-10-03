@@ -22,7 +22,8 @@ from telethon.tl.types import MessageEntityMentionName
 from cowpy import cow
 
 from userbot import CMD_HELP
-from userbot.events import register
+from userbot.events import register, errors_handler
+from userbot.modules.admin import get_user_from_event
 
 # ================= CONSTANT =================
 METOOSTR = [
