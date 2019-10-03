@@ -1184,15 +1184,16 @@ async def smrk(smk):
              reply_text = message + smirk
              await smk.edit(reply_text)
 
-
-@register(outgoing=True, pattern=r"\.f (.*)")
-async def payf(e):
-    if not e.text[0].isalpha() and e.text[0] not in ("/", "#", "@", "!"):
-        paytext = e.pattern_match.group(1)
-        pay = "{}\n{}\n{}\n{}\n{}\n{}\n{}".format(paytext*5, paytext*1,paytext*1, paytext*4, paytext*1, paytext*1, paytext*1)
-        await e.edit(pay)
-
-
+@register(outgoing=True, pattern=r"^.f (.*)")
+@errors_handler
+async def payf(event):
+    paytext = event.pattern_match.group(1)
+    pay = "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}".format(
+        paytext * 8, paytext * 8, paytext * 2, paytext * 2, paytext * 2,
+        paytext * 6, paytext * 6, paytext * 2, paytext * 2, paytext * 2,
+        paytext * 2, paytext * 2)
+    await event.edit(pay)
+        
 @register(outgoing=True, pattern="^.lfy (.*)",)
 async def let_me_google_that_for_you(lmgtfy_q):
     if not lmgtfy_q.text[0].isalpha() and lmgtfy_q.text[0] not in ("/", "#", "@", "!"):
@@ -1239,6 +1240,40 @@ async def typewriter(typew):
             await asyncio.sleep(sleep_time)
             await typew.edit(old_text)
             await asyncio.sleep(sleep_time)
+			  
+@register(pattern=r".scam(?: |$)(.*)", outgoing=True)
+@errors_handler
+async def scam(event):
+    """ Just a small command to fake chat actions for fun !! """
+    options = [
+        'typing', 'contact', 'game', 'location', 'voice', 'round', 'video',
+        'photo', 'document', 'cancel'
+    ]
+    input_str = event.pattern_match.group(1)
+    args = input_str.split()
+    if len(args) is 0:  # Let bot decide action and time
+        scam_action = random.choice(options)
+        scam_time = random.randint(30, 60)
+    elif len(args) is 1:  # User decides time/action, bot decides the other.
+        try:
+            scam_action = str(args[0]).lower()
+            scam_time = random.randint(30, 60)
+        except ValueError:
+            scam_action = random.choice(options)
+            scam_time = int(args[0])
+    elif len(args) is 2:  # User decides both action and time
+        scam_action = str(args[0]).lower()
+        scam_time = int(args[1])
+    else:
+        await event.edit("`Invalid Syntax !!`")
+        return
+    try:
+        if (scam_time > 0):
+            await event.delete()
+            async with event.client.action(event.chat_id, scam_action):
+                await asyncio.sleep(scam_time)
+    except BaseException:
+        return
 
 CMD_HELP.update({
     "memes": ".cowsay\
@@ -1293,6 +1328,9 @@ CMD_HELP.update({
 \nUsage: Praise people!\
 \n\n.f <emoji/character>\
 \nUsage: Pay Respects.\
+\n\n.scam <action> <time>\
+\n[Available Actions: (typing, contact, game, location, voice, round, video, photo, document, cancel)]\
+\nUsage: Create fake chat actions, for fun. (Default action: typing)\
 \n\n.bt\
 \nUsage: Believe me, you will find this useful.\
 \n\n.smk <text/reply>\
@@ -1308,7 +1346,7 @@ CMD_HELP.update({
 \n\n.chu\
 \nUsage: Incase, the person infront of you is....\
 \n\n.fuk\
-\nUsage: The onlu word that can be used fucking everywhere.\
+\nUsage: The only fucking word that can be used fucking everywhere.\
 \n\n.thanos\
 \nUsage: Try and then Snap.\
 \n\n.noob\
