@@ -528,15 +528,13 @@ async def gspider(gspdr):
                 f"USER: [{user.first_name}](tg://user?id={user.id})\n"
                 f"CHAT: {gspdr.chat.title}(`{gspdr.chat_id}`)")
 
-
-@register(outgoing=True, pattern="^.delusers(?: |$)(.*)")
-@errors_handler
+@register(outgoing=True, pattern="^.zombies(?: |$)(.*)", groups_only=True)
 async def rm_deletedacc(show):
     """ For .delusers command, list all the ghost/deleted accounts in a chat. """
     if not show.is_group:
         await show.edit("`I don't think this is a group.`")
         return
-    con = show.pattern_match.group(1)
+    con = show.pattern_match.group(1).lower()
     del_u = 0
     del_status = "`No deleted accounts found, Group is cleaned as Hell`"
 
@@ -599,7 +597,6 @@ async def rm_deletedacc(show):
             BOTLOG_CHATID, "#CLEANUP\n"
             f"Cleaned **{del_u}** deleted account(s) !!\
             \nCHAT: {show.chat.title}(`{show.chat_id}`)")
-
 
 @register(outgoing=True, pattern="^.admins$")
 @errors_handler
@@ -820,7 +817,7 @@ CMD_HELP.update({
 \nUsage: Mutes the person in all groups you have in common with them.\
 \n\n.ungmute <username/reply>\
 \nUsage: Reply someone's message with .ungmute to remove them from the gmuted list.\
-\n\n.delusers\
+\n\n.zombies\
 \nUsage: Searches for deleted accounts in a group. Use .delusers clean to remove deleted accounts from the group.\
 \n\n.admins\
 \nUsage: Retrieves a list of admins in the chat.\
